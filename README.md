@@ -77,6 +77,9 @@ java -cp target/classes:$(mvn dependency:build-classpath -q -Dmdep.outputFile=/d
 | PostgreSQL JDBC | 42.7.3 | PostgreSQL JDBC driver |
 | dotenv-java | 3.0.5 | Environment variable loading |
 | JUnit 5 | 5.10.0 | Unit testing |
+| Testcontainers | 1.19.7 | Integration testing with Docker containers |
+| Testcontainers MySQL | 1.19.7 | MySQL container support |
+| Testcontainers PostgreSQL | 1.19.7 | PostgreSQL container support |
 
 ## 🔧 Configuration
 
@@ -167,10 +170,55 @@ public class Example {
 
 ## 🧪 Testing
 
-Run unit tests:
+Run all tests (unit + integration):
 
 ```bash
 mvn test
+```
+
+Run only unit tests (skip integration tests):
+
+```bash
+mvn test -DskipITs=false
+```
+
+Run only integration tests:
+
+```bash
+mvn verify -DskipTests=true -DskipITs=false
+```
+
+### Test Types
+
+| Test Class | Type | Description |
+|------------|------|-------------|
+| `DatabaseConfigTest` | Unit | Tests environment variable loading and configuration |
+| `DatabaseConnectorMySqlTest` | Integration | Tests MySQL connection using Testcontainers |
+| `DatabaseConnectorPostgreSqlTest` | Integration | Tests PostgreSQL connection using Testcontainers |
+
+### Testcontainers
+
+The project uses [Testcontainers](https://www.testcontainers.org/) for integration testing with real database containers:
+
+- **MySQL**: `mysql:8.3` image
+- **PostgreSQL**: `postgres:16` image
+
+**Prerequisites for integration tests:**
+- Docker installed and running
+- Sufficient memory allocated to Docker (recommended: 4GB+)
+
+**Disabling integration tests:**
+
+To skip integration tests (useful when Docker is not available):
+
+```bash
+mvn test -DskipITs=true
+```
+
+Or use the Maven profile:
+
+```bash
+mvn test -Pno-integration-tests
 ```
 
 Tests cover:
@@ -178,6 +226,9 @@ Tests cover:
 - JDBC URL generation for MySQL and PostgreSQL
 - Configuration validation
 - Error handling for missing required variables
+- Real database connection testing with MySQL
+- Real database connection testing with PostgreSQL
+- Query execution and result verification
 
 ## 📝 API Documentation
 
